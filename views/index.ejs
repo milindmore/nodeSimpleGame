@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+   
+    <%- include includeScripts %>
+
+  </head>
+  <body>
+
+  	<script type="text/javascript">
+
+  	if (!Array.prototype.indexOf)
+	{
+	  Array.prototype.indexOf = function(elt /*, from*/)
+	  {
+	    var len = this.length;
+
+	    var from = Number(arguments[1]) || 0;
+	    from = (from < 0)
+	         ? Math.ceil(from)
+	         : Math.floor(from);
+	    if (from < 0)
+	      from += len;
+
+	    for (; from < len; from++)
+	    {
+	      if (from in this &&
+	          this[from] === elt)
+	        return from;
+	    }
+	    return -1;
+	  };
+	}
+
+  	var HashTable = function(){
+  		var values = [];
+  		var keys = [];
+
+  		var self = this;
+
+  		this.getValue = function ( key){
+  			var index = keys.indexOf(key);
+  			if( index !== -1)
+  				return values[index];
+  			else
+  				return null;
+  		};
+
+  		this.setValue = function(key, value){
+  			var valueAux = self.getValue(key);
+  			if( valueAux !== null){
+  				self.deleteElement(key);
+  			}
+  			values.push(value);
+  			keys.push(key);
+  		};
+
+  		this.deleteElement = function (key){
+  			var index = keys.indexOf(key);
+  			if(index !== -1 ){
+				keys.splice(index, 1);
+				values.splice(index, 1);
+				return true;
+  			}
+  			else
+  				return false;
+  		};
+
+  		this.clear = function (){
+  			values.splice(0, values.length);
+  			keys.splice(0, values.length);
+  		};
+  	}
+
+  	
+
+  	var World = function(){
+  		var self = this;
+  		//Board that represent the world of the game
+  		var tideWorld = $("#tideGameWorld");
+
+  		var objectTemplate = "<div style='position:absolute'></div>";
+  		//Contains a list of all the objects created in the world so we do not have to iterate in the DOM
+		var objectsInWorld = new HashTable();
+
+		//Creates an object base on the template
+		var createObjt = function(){
+			return $(objectTemplate);
+		}
+
+		//Gets an object in the world base on his id
+		var getObjectById = function(id){
+			var obj = objectsInWorld.getValue(id);
+			if( obj === null)
+			{
+				obj = self.createObjt();
+				tideWorld.append(obj);
+			}
+
+			return obj;
+		}
+
+  		this.drawMe = function(objectId, size, position, imageClass){
+  			var obj = self.getObjectById(objectId);
+			obj.css("width", size.width + "px");
+			obj.css("height", size.height + "px");
+  			obj.class(imageClass);
+  			obj.position(self.calculateWorldPosition(position));
+
+  		}
+
+  	};
+
+  	/*
+  		This objects represents the players, everyone has a id that identifys them
+  	*/
+  	function Player (world  /*Needs to be an instance of World*/){
+  		var self = this;
+
+  		var myWorld = world;
+
+  		self.id = Math.floor(Math.random()*11);
+
+  		var inMotion = false;
+
+  		var direction = 0; //Possible values 0 - UP 1 - Down  2 - Right 3 - Left
+
+  		var imageClass = ["up","down", "right", "left"]; //Array of Strings that inidcate the CSS class of the player for each possible action
+
+  		var getImageClass = function(){
+			return imageClass[direction];
+  		}
+
+  		var position = {
+  			xPosition : 30,
+  			yPosition : 30
+  		};
+
+  		var size = {
+  			width: 50,
+  			height: 50
+  		};
+
+  		this.setDirection= function (dirValue){
+			direction = dirValue;
+  		};
+
+  		this.setInMotion = function(){
+  			inMotion = false;
+  		};
+
+  		this.stopMotion = function(){
+  			inMotion = true;
+  		};
+
+  		this.frameNotify = function(){
+  			world.drawMe(self.id, size, position, getImageClass());
+  		};
+
+  	};
+
+  	
+
+  	</script>
+
+	
+
+    <h1><%= title %></h1>
+    <p>Welcome to <%= title %></p>
+
+    <div id="tideGameWorld" class="tildeMap">
+
+    </div>
+
+  </body>
+</html>
