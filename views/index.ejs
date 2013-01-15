@@ -9,159 +9,236 @@
   </head>
   <body>
 
-  	<script type="text/javascript">
+  	<script id="classDefinition" type="text/javascript">
 
-  	if (!Array.prototype.indexOf)
-	{
-	  Array.prototype.indexOf = function(elt /*, from*/)
-	  {
-	    var len = this.length;
 
-	    var from = Number(arguments[1]) || 0;
-	    from = (from < 0)
-	         ? Math.ceil(from)
-	         : Math.floor(from);
-	    if (from < 0)
-	      from += len;
+    $(document).keyup(function(e) {
+      debugger;
+          alert(e.keyCode);
+        });
 
-	    for (; from < len; from++)
-	    {
-	      if (from in this &&
-	          this[from] === elt)
-	        return from;
-	    }
-	    return -1;
-	  };
-	}
+    	if (!Array.prototype.indexOf){
+    	  Array.prototype.indexOf = function(elt /*, from*/)
+    	  {
+    	    var len = this.length;
 
-  	var HashTable = function(){
-  		var values = [];
-  		var keys = [];
+    	    var from = Number(arguments[1]) || 0;
+    	    from = (from < 0)
+    	         ? Math.ceil(from)
+    	         : Math.floor(from);
+    	    if (from < 0)
+    	      from += len;
 
-  		var self = this;
+    	    for (; from < len; from++)
+    	    {
+    	      if (from in this &&
+    	          this[from] === elt)
+    	        return from;
+    	    }
+    	    return -1;
+    	  };
+	   }
 
-  		this.getValue = function ( key){
-  			var index = keys.indexOf(key);
-  			if( index !== -1)
-  				return values[index];
-  			else
-  				return null;
-  		};
+    	var HashTable = function(){
+    		var values = [];
+    		var keys = [];
 
-  		this.setValue = function(key, value){
-  			var valueAux = self.getValue(key);
-  			if( valueAux !== null){
-  				self.deleteElement(key);
-  			}
-  			values.push(value);
-  			keys.push(key);
-  		};
+    		var self = this;
 
-  		this.deleteElement = function (key){
-  			var index = keys.indexOf(key);
-  			if(index !== -1 ){
-				keys.splice(index, 1);
-				values.splice(index, 1);
-				return true;
-  			}
-  			else
-  				return false;
-  		};
+    		this.getValue = function ( key){
+    			var index = keys.indexOf(key);
+    			if( index !== -1)
+    				return values[index];
+    			else
+    				return null;
+    		};
 
-  		this.clear = function (){
-  			values.splice(0, values.length);
-  			keys.splice(0, values.length);
-  		};
-  	}
+    		this.setValue = function(key, value){
+    			var valueAux = self.getValue(key);
+    			if( valueAux !== null){
+    				self.deleteElement(key);
+    			}
+    			values.push(value);
+    			keys.push(key);
+    		};
 
-  	
+    		this.deleteElement = function (key){
+    			var index = keys.indexOf(key);
+    			if(index !== -1 ){
+  				keys.splice(index, 1);
+  				values.splice(index, 1);
+  				return true;
+    			}
+    			else
+    				return false;
+    		};
 
-  	var World = function(){
-  		var self = this;
-  		//Board that represent the world of the game
-  		var tideWorld = $("#tideGameWorld");
+    		this.clear = function (){
+    			values.splice(0, values.length);
+    			keys.splice(0, values.length);
+    		};
+    	}
 
-  		var objectTemplate = "<div style='position:absolute'></div>";
-  		//Contains a list of all the objects created in the world so we do not have to iterate in the DOM
-		var objectsInWorld = new HashTable();
+    	
 
-		//Creates an object base on the template
-		var createObjt = function(){
-			return $(objectTemplate);
-		}
+    	var World = function(){
+    		var self = this;
+    		//Board that represent the world of the game
+    		var tideWorld = $("#tideGameWorld");
 
-		//Gets an object in the world base on his id
-		var getObjectById = function(id){
-			var obj = objectsInWorld.getValue(id);
-			if( obj === null)
-			{
-				obj = self.createObjt();
-				tideWorld.append(obj);
-			}
+    		var objectTemplate = "<div style='position:absolute'></div>";
+    		//Contains a list of all the objects created in the world so we do not have to iterate in the DOM
+    		var objectsInWorld = new HashTable();
 
-			return obj;
-		}
+    		//Creates an object base on the template
+    		var createObjt = function(){
+    			return $(objectTemplate);
+    		}
 
-  		this.drawMe = function(objectId, size, position, imageClass){
-  			var obj = self.getObjectById(objectId);
-			obj.css("width", size.width + "px");
-			obj.css("height", size.height + "px");
-  			obj.class(imageClass);
-  			obj.position(self.calculateWorldPosition(position));
+    		//Gets an object in the world base on his id
+    		this.getObjectById = function(id){
+    			var obj = objectsInWorld.getValue(id);
+    			if( obj === null)
+    			{
+    				obj = self.createObjt();
+    				tideWorld.append(obj);
+    			}
 
-  		}
+    			return obj;
+    		};
 
-  	};
+        this.calculateWorldPosition = function(position){
+            //maybe is need it
+        };
 
-  	/*
-  		This objects represents the players, everyone has a id that identifys them
-  	*/
-  	function Player (world  /*Needs to be an instance of World*/){
-  		var self = this;
+    		this.drawMe = function(objectId, size, position, imageClass){
+    			var obj = self.getObjectById(objectId);
+          tideWorld.append(obj);
+    			obj.css("width", size.width + "px");
+    			obj.css("height", size.height + "px");
+    			obj.class(imageClass);
+    			obj.position(position);
 
-  		var myWorld = world;
+    		}
 
-  		self.id = Math.floor(Math.random()*11);
 
-  		var inMotion = false;
 
-  		var direction = 0; //Possible values 0 - UP 1 - Down  2 - Right 3 - Left
+    	};
 
-  		var imageClass = ["up","down", "right", "left"]; //Array of Strings that inidcate the CSS class of the player for each possible action
+      function Actor (){
 
-  		var getImageClass = function(){
-			return imageClass[direction];
-  		}
+        var self = this;
 
-  		var position = {
-  			xPosition : 30,
-  			yPosition : 30
-  		};
+        this.myWorld = null //params.world;  /*Needs to be an instance of World*/
 
-  		var size = {
-  			width: 50,
-  			height: 50
-  		};
+        self.id = Math.floor(Math.random()*11);
 
-  		this.setDirection= function (dirValue){
-			direction = dirValue;
-  		};
+        var inMotion = false;
 
-  		this.setInMotion = function(){
-  			inMotion = false;
-  		};
+        this.direction = 0; //Possible values 0 - UP 1 - Down  2 - Right 3 - Left
 
-  		this.stopMotion = function(){
-  			inMotion = true;
-  		};
 
-  		this.frameNotify = function(){
-  			world.drawMe(self.id, size, position, getImageClass());
-  		};
+        this.setDirection= function (dirValue){
+           direction = dirValue;
+        };
 
-  	};
+        this.setInMotion = function(){
+          inMotion = false;
+        };
 
-  	
+        this.stopMotion = function(){
+          inMotion = true;
+        };
+
+        this.position = {
+          xPosition : 30,
+          yPosition : 30
+        };
+
+        this.size = {
+          width: 50,
+          height: 50
+        };
+
+        this.frameNotify = function(){
+          self.calculateNewPosition();
+          self.world.drawMe(self.id,self.size, self.position, self.getImageClass()/*getImageClass must be implemented in subClass class*/);
+        };
+      };
+
+
+
+    	/*
+    		This objects represents the players, everyone has a id that identifys them
+    	*/
+    	function Player (params){
+
+        var self = this;
+
+    		var imageClass = ["up","down", "right", "left"]; //Array of Strings that inidcate the CSS class of the player for each possible action
+
+    		this.getImageClass = function(){
+  			   return imageClass[this.direction];
+    		}
+    	};
+
+    	Player.prototype = new Actor();
+      Player.prototype.init =  function(params){
+
+        this.world = params.world;
+        //do
+
+        params = null;
+      };
+
+
+
+      function MotionEngine(){
+
+      };
+
+      function HumanEngine(player /*instance of player*/){
+        if( player instanceof Player === false )
+            throw new Error("player must be an instance of Player");
+
+        
+          this.init(player);
+
+/*  KeyDown && KeyDown: 
+  Up - 87 (W)
+  Down - 83 (S)
+  Left - 65 (A)
+  Right - 68 (D)
+
+  Laser - 88 (X)
+*/
+
+
+        function setDirection = function ( keyCode)
+        {
+          switch(keyCode)
+          {
+            case 87: /*Up*/
+              player.setDirection(0);
+            break;
+            case 83: /*Down*/
+              player.setDirection(1);
+            break;
+            case 68: /*Right*/
+              player.setDirection(2);
+            break;
+            case 65: /*Left*/
+              player.setDirection(3);
+            break;
+            
+
+            case 88: /*Laser*/
+            /*ShootLaser!!!*/
+            break
+          }
+        }
+ 
+      };
 
   	</script>
 
